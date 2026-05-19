@@ -342,6 +342,107 @@
     }
     .footer a { color: #667eea; }
 
+    /* ========== Pomodoro Timer ========== */
+    .pomodoro-card {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 24px 20px;
+    }
+    .pomodoro-mode-selector {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .pomo-mode-btn {
+      background: #2a2a3e;
+      border: 1px solid #3a3a5e;
+      color: #888;
+      padding: 6px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .pomo-mode-btn:hover { color: #e0e0e0; }
+    .pomo-mode-btn.active {
+      background: #667eea;
+      border-color: #667eea;
+      color: #fff;
+    }
+
+    .pomo-ring-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 16px;
+    }
+    .pomo-ring {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .pomo-ring-bg {
+      fill: none;
+      stroke: #2a2a3e;
+      stroke-width: 6;
+    }
+    .pomo-ring-progress {
+      fill: none;
+      stroke: #667eea;
+      stroke-width: 6;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.3s ease;
+    }
+    .pomo-ring-progress.short { stroke: #4caf50; }
+    .pomo-ring-progress.long { stroke: #2196f3; }
+    .pomo-time {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .pomo-stats {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    .pomo-stats strong { color: #e0e0e0; }
+
+    .pomo-controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+    .pomo-btn {
+      background: #2a2a3e;
+      border: 1px solid #3a3a5e;
+      color: #e0e0e0;
+      padding: 8px 24px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .pomo-btn:hover { background: #3a3a5e; }
+    .pomo-btn-primary {
+      background: #667eea;
+      border-color: #667eea;
+      color: #fff;
+    }
+    .pomo-btn-primary:hover { background: #5a6fd6; }
+    .pomo-btn-primary.running {
+      background: #f44336;
+      border-color: #f44336;
+    }
+
     /* ========== Responsive ========== */
     @media (max-width: 900px) {
       .dashboard-grid { grid-template-columns: 1fr; }
@@ -452,6 +553,35 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- ===== Pomodoro Timer ===== -->
+    <div class="card pomodoro-card">
+      <div class="card-title">🍅 番茄时钟</div>
+      <div class="pomodoro-mode-selector">
+        <button class="pomo-mode-btn active" data-mode="focus" onclick="setPomoMode('focus')">🎯 专注</button>
+        <button class="pomo-mode-btn" data-mode="short" onclick="setPomoMode('short')">☕ 短休</button>
+        <button class="pomo-mode-btn" data-mode="long" onclick="setPomoMode('long')">🌿 长休</button>
+      </div>
+
+      <div class="pomo-ring-container">
+        <svg class="pomo-ring" viewBox="0 0 200 200">
+          <circle class="pomo-ring-bg" cx="100" cy="100" r="88" />
+          <circle class="pomo-ring-progress" id="pomo-ring-progress" cx="100" cy="100" r="88"
+            stroke-dasharray="553" stroke-dashoffset="0" />
+        </svg>
+        <div class="pomo-time" id="pomo-time-display">25:00</div>
+      </div>
+
+      <div class="pomo-stats">
+        <span>🍅 今日 <strong id="pomo-count">0</strong></span>
+        <span>⏱️ 已完成 <strong id="pomo-completed">0</strong></span>
+      </div>
+
+      <div class="pomo-controls">
+        <button class="pomo-btn pomo-btn-primary" id="pomo-start-btn" onclick="togglePomo()">▶ 开始</button>
+        <button class="pomo-btn" onclick="resetPomo()">⟳ 重置</button>
+      </div>
     </div>
 
     <div class="footer">
@@ -849,6 +979,145 @@ function deleteGoal(index) {
 }
 
 // ============================================================
+//  POMODORO TIMER
+// ============================================================
+const POMO_CONFIG = {
+  focus:  { time: 25 * 60, label: '🎯 专注时间' },
+  short:  { time: 5 * 60,  label: '☕ 短休息' },
+  long:   { time: 15 * 60, label: '🌿 长休息' },
+};
+
+let pomoState = {
+  mode: 'focus',
+  timeLeft: 25 * 60,
+  isRunning: false,
+  interval: null,
+  todayCount: 0,
+  completed: 0,
+};
+
+function loadPomoState() {
+  try {
+    const saved = localStorage.getItem('pomo_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      pomoState.mode = parsed.mode || 'focus';
+      pomoState.todayCount = parsed.todayCount || 0;
+      pomoState.completed = parsed.completed || 0;
+      pomoState.timeLeft = POMO_CONFIG[pomoState.mode].time;
+      pomoState.isRunning = false;
+      pomoState.interval = null;
+    }
+  } catch {}
+}
+
+function savePomoState() {
+  localStorage.setItem('pomo_state', JSON.stringify({
+    mode: pomoState.mode,
+    todayCount: pomoState.todayCount,
+    completed: pomoState.completed,
+    date: new Date().toDateString(),
+  }));
+}
+
+function setPomoMode(mode) {
+  if (pomoState.isRunning) return;
+  pomoState.mode = mode;
+  pomoState.timeLeft = POMO_CONFIG[mode].time;
+  document.querySelectorAll('.pomo-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  const ring = document.getElementById('pomo-ring-progress');
+  ring.classList.remove('short', 'long');
+  if (mode === 'short') ring.classList.add('short');
+  else if (mode === 'long') ring.classList.add('long');
+  updatePomoDisplay();
+}
+
+function updatePomoDisplay() {
+  const mins = Math.floor(pomoState.timeLeft / 60);
+  const secs = pomoState.timeLeft % 60;
+  document.getElementById('pomo-time-display').textContent =
+    `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  const total = POMO_CONFIG[pomoState.mode].time;
+  const progress = pomoState.timeLeft / total;
+  const circumference = 553;
+  document.getElementById('pomo-ring-progress').style.strokeDashoffset =
+    circumference * (1 - progress);
+  const modeLabel = POMO_CONFIG[pomoState.mode].label;
+  document.title = pomoState.isRunning
+    ? `🍅 ${document.getElementById('pomo-time-display').textContent} - ${modeLabel}`
+    : 'My Dashboard';
+  document.getElementById('pomo-count').textContent = pomoState.todayCount;
+  document.getElementById('pomo-completed').textContent = pomoState.completed;
+}
+
+function togglePomo() {
+  const btn = document.getElementById('pomo-start-btn');
+  if (pomoState.isRunning) {
+    clearInterval(pomoState.interval);
+    pomoState.isRunning = false;
+    btn.textContent = '▶ 继续';
+    btn.classList.remove('running');
+    document.title = 'My Dashboard';
+  } else {
+    pomoState.interval = setInterval(() => {
+      pomoState.timeLeft--;
+      updatePomoDisplay();
+      if (pomoState.timeLeft <= 0) {
+        clearInterval(pomoState.interval);
+        pomoState.isRunning = false;
+        btn.textContent = '▶ 开始';
+        btn.classList.remove('running');
+        if (pomoState.mode === 'focus') {
+          pomoState.todayCount++;
+          pomoState.completed++;
+          savePomoState();
+          updatePomoDisplay();
+        }
+        if (Notification.permission === 'granted') {
+          new Notification('🍅 番茄钟完成！', {
+            body: `${POMO_CONFIG[pomoState.mode].label} 已结束！`,
+          });
+        }
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.value = 880;
+          gain.gain.value = 0.3;
+          osc.start();
+          setTimeout(() => osc.stop(), 500);
+        } catch {}
+        document.title = '🍅 时间到！ - My Dashboard';
+        if (pomoState.mode === 'focus') {
+          setTimeout(() => setPomoMode('short'), 1000);
+        } else {
+          setTimeout(() => setPomoMode('focus'), 1000);
+        }
+      }
+    }, 1000);
+    pomoState.isRunning = true;
+    btn.textContent = '⏸ 暂停';
+    btn.classList.add('running');
+  }
+}
+
+function resetPomo() {
+  if (pomoState.isRunning) {
+    clearInterval(pomoState.interval);
+    pomoState.isRunning = false;
+  }
+  document.getElementById('pomo-start-btn').textContent = '▶ 开始';
+  document.getElementById('pomo-start-btn').classList.remove('running');
+  pomoState.timeLeft = POMO_CONFIG[pomoState.mode].time;
+  updatePomoDisplay();
+  document.title = 'My Dashboard';
+}
+
+// ============================================================
 //  HELPERS
 // ============================================================
 function escapeHtml(text) {
@@ -863,6 +1132,8 @@ function renderAll() {
   renderStudy();
   renderLeisure();
   renderGoals();
+  loadPomoState();
+  setPomoMode(pomoState.mode);
 }
 
 // ============================================================
@@ -872,6 +1143,11 @@ function updateDate() {
   const now = new Date();
   const opts = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
   document.getElementById('current-date').textContent = now.toLocaleDateString('zh-CN', opts);
+}
+
+// Request notification permission
+if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission();
 }
 
 // Set greeting based on time
