@@ -708,7 +708,7 @@
   <div class="header">
     <div>
       <h1>✦ My Dashboard</h1>
-      <div class="greeting">你好，<strong id="greeting-name">朋友</strong> · <span id="current-date"></span></div>
+      <div class="greeting">你好，<strong id="greeting-name">乔云浩</strong> · <span id="current-date"></span></div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
       <button onclick="resetAllData()" style="background:#2a2a3e;color:#888;border:1px solid #3a3a5e;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;">🔄 重置数据</button>
@@ -1663,7 +1663,7 @@ const hour = new Date().getHours();
 let greeting = '早上好';
 if (hour >= 12 && hour < 18) greeting = '下午好';
 else if (hour >= 18) greeting = '晚上好';
-document.getElementById('greeting-name').textContent = `${greeting}！`;
+document.getElementById('greeting-name').textContent = `乔云浩，${greeting}！`;
 
 updateDate();
 renderAll();
