@@ -87,6 +87,15 @@
       position: relative;
       overflow: hidden;
     }
+    .weather-body {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .weather-left-col { flex: 1; min-width: 280px; }
+    .weather-right-col { flex: 1; min-width: 280px; display: flex; flex-direction: column; align-items: center; }
     .weather-card::before {
       content: '';
       position: absolute;
@@ -166,6 +175,90 @@
       flex-shrink: 0;
     }
     .weather-add button:hover { background: #5a6fd6; }
+
+    /* ========== Forecast Chart ========== */
+    .forecast-title {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 4px;
+      align-self: flex-start;
+    }
+    #forecast-chart {
+      width: 100%;
+      max-width: 320px;
+      height: 140px;
+      border-radius: 8px;
+    }
+    .forecast-labels {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 320px;
+      font-size: 10px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    /* ========== Pomodoro Settings ========== */
+    .pomo-settings {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .pomo-settings label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #888;
+    }
+    .pomo-settings input {
+      width: 48px;
+      background: #2a2a3e;
+      border: 1px solid #3a3a5e;
+      color: #e0e0e0;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      text-align: center;
+      outline: none;
+    }
+    .pomo-settings input:focus { border-color: #667eea; }
+    .pomo-settings .save-pomo {
+      background: #667eea;
+      color: #fff;
+      border: none;
+      padding: 3px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .pomo-settings .save-pomo:hover { background: #5a6fd6; }
+
+    .pomo-goal-select {
+      margin: 10px 0;
+      padding: 8px 12px;
+      background: #2a2a3e;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .pomo-goal-select select {
+      flex: 1;
+      background: #1a1a2e;
+      border: 1px solid #3a3a5e;
+      color: #e0e0e0;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+    }
+    .pomo-goal-select select:focus { border-color: #667eea; }
+
     .weather-content {
       display: flex;
       align-items: center;
@@ -748,7 +841,7 @@
   <div class="header">
     <div>
       <h1>✦ My Dashboard</h1>
-      <div class="greeting">你好，<strong id="greeting-name">乔云浩</strong> · <span id="current-date"></span></div>
+      <div class="greeting"><strong id="greeting-name">乔云浩</strong> · <span id="current-date"></span></div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
       <button onclick="resetAllData()" style="background:#2a2a3e;color:#888;border:1px solid #3a3a5e;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;">🔄 重置数据</button>
@@ -759,26 +852,35 @@
 
     <!-- ===== Weather ===== -->
     <div class="card weather-card">
-      <div class="weather-content">
-        <div class="weather-left">
-          <div id="weather-icon" style="font-size:48px;">☀️</div>
-          <div>
-            <div class="weather-temp" id="weather-temp">--°C</div>
-            <div class="weather-desc" id="weather-desc">加载中...</div>
-            <div class="weather-city" id="weather-city">📍 东海县</div>
+      <div class="weather-body">
+        <div class="weather-left-col">
+          <div class="weather-content">
+            <div class="weather-left">
+              <div id="weather-icon" style="font-size:48px;">☀️</div>
+              <div>
+                <div class="weather-temp" id="weather-temp">--°C</div>
+                <div class="weather-desc" id="weather-desc">加载中...</div>
+                <div class="weather-city" id="weather-city">📍 东海县</div>
+              </div>
+            </div>
+            <div class="weather-details">
+              <span>💧 <span id="weather-humidity">--</span></span>
+              <span>🌬️ <span id="weather-wind">--</span></span>
+              <span>🔆 <span id="weather-uv">--</span></span>
+            </div>
+          </div>
+          <div class="weather-manage">
+            <div class="weather-cities" id="weather-cities"></div>
+            <div class="weather-add">
+              <input type="text" id="weather-city-input" placeholder="添加城市（如：东海县）" maxlength="30">
+              <button onclick="addWeatherCity()">➕</button>
+            </div>
           </div>
         </div>
-        <div class="weather-details">
-          <span>💧 <span id="weather-humidity">--</span></span>
-          <span>🌬️ <span id="weather-wind">--</span></span>
-          <span>🔆 <span id="weather-uv">--</span></span>
-        </div>
-      </div>
-      <div class="weather-manage">
-        <div class="weather-cities" id="weather-cities"></div>
-        <div class="weather-add">
-          <input type="text" id="weather-city-input" placeholder="添加城市（如：东海县）" maxlength="30">
-          <button onclick="addWeatherCity()">➕</button>
+        <div class="weather-right-col">
+          <div class="forecast-title">📈 未来天气趋势</div>
+          <canvas id="forecast-chart" width="320" height="160"></canvas>
+          <div class="forecast-labels" id="forecast-labels"></div>
         </div>
       </div>
     </div>
@@ -908,7 +1010,15 @@
 
     <!-- ===== Pomodoro Timer ===== -->
     <div class="card pomodoro-card">
-      <div class="card-title">🍅 番茄时钟</div>
+      <div class="card-title">🍅 番茄时钟 <span class="badge" style="cursor:pointer;" onclick="togglePomoSettings()">⚙️ 设置</span></div>
+
+      <div class="pomo-settings" id="pomo-settings" style="display:none;">
+        <label>🎯 专注 <input type="number" id="pomo-custom-focus" min="1" max="120" value="25"> 分</label>
+        <label>☕ 短休 <input type="number" id="pomo-custom-short" min="1" max="30" value="5"> 分</label>
+        <label>🌿 长休 <input type="number" id="pomo-custom-long" min="1" max="60" value="15"> 分</label>
+        <button class="save-pomo" onclick="savePomoSettings()">💾 保存</button>
+      </div>
+
       <div class="pomodoro-mode-selector">
         <button class="pomo-mode-btn active" data-mode="focus" onclick="setPomoMode('focus')">🎯 专注</button>
         <button class="pomo-mode-btn" data-mode="short" onclick="setPomoMode('short')">☕ 短休</button>
@@ -922,6 +1032,13 @@
             stroke-dasharray="553" stroke-dashoffset="0" />
         </svg>
         <div class="pomo-time" id="pomo-time-display">25:00</div>
+      </div>
+
+      <div class="pomo-goal-select" id="pomo-goal-select">
+        <span>🎯 正在做：</span>
+        <select id="pomo-goal-choice" onchange="savePomoGoal()">
+          <option value="">-- 选择目标 --</option>
+        </select>
       </div>
 
       <div class="pomo-stats">
@@ -1049,7 +1166,6 @@ async function fetchWeather() {
   try {
     const cities = getWeatherCities();
     const active = localStorage.getItem('weather_active_city') || (cities[0] || '东海县');
-    // Convert Chinese name to pinyin for wttr.in (use Chinese directly, wttr.in supports it)
     const url = `https://wttr.in/${encodeURIComponent(active)}?format=j1&lang=zh`;
 
     const resp = await fetch(url, { cache: 'no-cache' });
@@ -1065,11 +1181,114 @@ async function fetchWeather() {
     document.getElementById('weather-humidity').textContent = `${cur.humidity}%`;
     document.getElementById('weather-wind').textContent = `${cur.windspeedKmph} km/h`;
     document.getElementById('weather-uv').textContent = `${cur.uvIndex}`;
+
+    // Draw forecast chart
+    if (json.weather) drawForecastChart(json.weather);
   } catch (e) {
     document.getElementById('weather-temp').textContent = '--°C';
     document.getElementById('weather-desc').textContent = '天气服务暂不可用';
     document.getElementById('weather-city').textContent = `📍 ${localStorage.getItem('weather_active_city') || '东海县'}`;
   }
+}
+
+function drawForecastChart(weatherData) {
+  const canvas = document.getElementById('forecast-chart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const days = weatherData.slice(0, 7);
+  const pad = { top: 15, bottom: 22, left: 28, right: 10 };
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+
+  // Find temp range
+  let minT = 50, maxT = -50;
+  const highs = [], lows = [];
+  days.forEach(d => {
+    const h = parseInt(d.maxtempC);
+    const l = parseInt(d.mintempC);
+    highs.push(h); lows.push(l);
+    if (h > maxT) maxT = h; if (l < minT) minT = l;
+  });
+  const range = maxT - minT || 10;
+  const padT = range * 0.15;
+  minT -= padT; maxT += padT;
+
+  const toY = (t) => pad.top + chartH - ((t - minT) / (maxT - minT)) * chartH;
+  const stepX = chartW / (days.length - 1);
+
+  // Clear
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = '#2a2a3e';
+  ctx.lineWidth = 1;
+  for (let t = Math.ceil(minT / 5) * 5; t <= maxT; t += 5) {
+    const y = toY(t);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#555';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`${t}°`, pad.left - 4, y + 3);
+  }
+
+  // Draw high temp line (red)
+  ctx.strokeStyle = '#ff6b6b';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  highs.forEach((h, i) => {
+    const x = pad.left + i * stepX;
+    const y = toY(h);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // High temp dots
+  highs.forEach((h, i) => {
+    const x = pad.left + i * stepX;
+    const y = toY(h);
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fillStyle = '#ff6b6b'; ctx.fill();
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = 'bold 9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${h}°`, x, y - 7);
+  });
+
+  // Draw low temp line (blue)
+  ctx.strokeStyle = '#4fc3f7';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  lows.forEach((l, i) => {
+    const x = pad.left + i * stepX;
+    const y = toY(l);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Low temp dots
+  lows.forEach((l, i) => {
+    const x = pad.left + i * stepX;
+    const y = toY(l);
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fillStyle = '#4fc3f7'; ctx.fill();
+    ctx.fillStyle = '#4fc3f7';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${l}°`, x, y + 13);
+  });
+
+  // Date labels
+  const labels = document.getElementById('forecast-labels');
+  const weekdays = ['日','一','二','三','四','五','六'];
+  labels.innerHTML = days.map((d, i) => {
+    const date = new Date(d.date);
+    const wd = weekdays[date.getDay()];
+    const md = `${date.getMonth()+1}/${date.getDate()}`;
+    const emoji = getWeatherEmoji(parseInt(d.hourly[0]?.weatherCode || 113));
+    return `<span>${emoji} ${wd}<br>${md}</span>`;
+  }).join('');
 }
 
 function getWeatherEmoji(code) {
@@ -1515,12 +1734,27 @@ function renderCustomAI(data) {
 }
 
 // ============================================================
-//  POMODORO TIMER
+//  POMODORO TIMER (可自定义 + 目标关联)
 // ============================================================
-const POMO_CONFIG = {
-  focus:  { time: 25 * 60, label: '🎯 专注时间' },
-  short:  { time: 5 * 60,  label: '☕ 短休息' },
-  long:   { time: 15 * 60, label: '🌿 长休息' },
+function loadPomoSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('pomo_settings'));
+    if (saved) return saved;
+  } catch {}
+  return { focus: 25, short: 5, long: 15 };
+}
+
+function savePomoSettingsToStorage(settings) {
+  localStorage.setItem('pomo_settings', JSON.stringify(settings));
+}
+
+const getPomoConfig = () => {
+  const s = loadPomoSettings();
+  return {
+    focus:  { time: s.focus * 60, label: '🎯 专注时间' },
+    short:  { time: s.short * 60, label: '☕ 短休息' },
+    long:   { time: s.long * 60,  label: '🌿 长休息' },
+  };
 };
 
 let pomoState = {
@@ -1540,14 +1774,17 @@ function loadPomoState() {
       pomoState.mode = parsed.mode || 'focus';
       pomoState.todayCount = parsed.todayCount || 0;
       pomoState.completed = parsed.completed || 0;
-      pomoState.timeLeft = POMO_CONFIG[pomoState.mode].time;
-      pomoState.isRunning = false;
       pomoState.interval = null;
     }
   } catch {}
+  // Apply custom times
+  const cfg = getPomoConfig();
+  pomoState.timeLeft = cfg[pomoState.mode].time;
+  pomoState.isRunning = false;
 }
 
 function savePomoState() {
+  const cfg = getPomoConfig();
   localStorage.setItem('pomo_state', JSON.stringify({
     mode: pomoState.mode,
     todayCount: pomoState.todayCount,
@@ -1556,10 +1793,51 @@ function savePomoState() {
   }));
 }
 
+function togglePomoSettings() {
+  const panel = document.getElementById('pomo-settings');
+  const s = loadPomoSettings();
+  document.getElementById('pomo-custom-focus').value = s.focus;
+  document.getElementById('pomo-custom-short').value = s.short;
+  document.getElementById('pomo-custom-long').value = s.long;
+  panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+}
+
+function savePomoSettings() {
+  if (pomoState.isRunning) return;
+  const focus = parseInt(document.getElementById('pomo-custom-focus').value) || 25;
+  const short = parseInt(document.getElementById('pomo-custom-short').value) || 5;
+  const long = parseInt(document.getElementById('pomo-custom-long').value) || 15;
+  savePomoSettingsToStorage({ focus, short, long });
+  document.getElementById('pomo-settings').style.display = 'none';
+  // Reset current mode time
+  const cfg = getPomoConfig();
+  pomoState.timeLeft = cfg[pomoState.mode].time;
+  setPomoMode(pomoState.mode);
+}
+
+function savePomoGoal() {
+  const sel = document.getElementById('pomo-goal-choice');
+  localStorage.setItem('pomo_active_goal', sel.value);
+}
+
+function renderPomoGoals() {
+  const data = getData();
+  const sel = document.getElementById('pomo-goal-choice');
+  const active = localStorage.getItem('pomo_active_goal') || '';
+  const goals = data.goals || [];
+  sel.innerHTML = '<option value="">-- 选择目标 --</option>' +
+    goals.map((g, i) => `<option value="${i}" ${active == i ? 'selected' : ''}>${escapeHtml(g.text)}</option>`).join('');
+  if (goals.length === 0) {
+    document.getElementById('pomo-goal-select').style.display = 'none';
+  } else {
+    document.getElementById('pomo-goal-select').style.display = 'flex';
+  }
+}
+
 function setPomoMode(mode) {
   if (pomoState.isRunning) return;
   pomoState.mode = mode;
-  pomoState.timeLeft = POMO_CONFIG[mode].time;
+  pomoState.timeLeft = getPomoConfig()[mode].time;
   document.querySelectorAll('.pomo-mode-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === mode);
   });
@@ -1575,12 +1853,12 @@ function updatePomoDisplay() {
   const secs = pomoState.timeLeft % 60;
   document.getElementById('pomo-time-display').textContent =
     `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-  const total = POMO_CONFIG[pomoState.mode].time;
+  const total = getPomoConfig()[pomoState.mode].time;
   const progress = pomoState.timeLeft / total;
   const circumference = 553;
   document.getElementById('pomo-ring-progress').style.strokeDashoffset =
     circumference * (1 - progress);
-  const modeLabel = POMO_CONFIG[pomoState.mode].label;
+  const modeLabel = getPomoConfig()[pomoState.mode].label;
   document.title = pomoState.isRunning
     ? `🍅 ${document.getElementById('pomo-time-display').textContent} - ${modeLabel}`
     : 'My Dashboard';
@@ -1613,7 +1891,7 @@ function togglePomo() {
         }
         if (Notification.permission === 'granted') {
           new Notification('🍅 番茄钟完成！', {
-            body: `${POMO_CONFIG[pomoState.mode].label} 已结束！`,
+            body: `${getPomoConfig()[pomoState.mode].label} 已结束！`,
           });
         }
         try {
@@ -1648,7 +1926,7 @@ function resetPomo() {
   }
   document.getElementById('pomo-start-btn').textContent = '▶ 开始';
   document.getElementById('pomo-start-btn').classList.remove('running');
-  pomoState.timeLeft = POMO_CONFIG[pomoState.mode].time;
+  pomoState.timeLeft = getPomoConfig()[pomoState.mode].time;
   updatePomoDisplay();
   document.title = 'My Dashboard';
 }
@@ -1671,6 +1949,7 @@ function renderAll() {
   loadPomoState();
   setPomoMode(pomoState.mode);
   renderWeatherCities();
+  renderPomoGoals();
   fetchRepos();
   loadCustomAI();
 }
@@ -1694,7 +1973,7 @@ const hour = new Date().getHours();
 let greeting = '早上好';
 if (hour >= 12 && hour < 18) greeting = '下午好';
 else if (hour >= 18) greeting = '晚上好';
-document.getElementById('greeting-name').textContent = `乔云浩，${greeting}！`;
+document.getElementById('greeting-name').textContent = `${greeting}，乔云浩`;
 
 updateDate();
 renderAll();
