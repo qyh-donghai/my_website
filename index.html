@@ -342,6 +342,182 @@
     }
     .footer a { color: #667eea; }
 
+    /* ========== GitHub Repos ========== */
+    .repo-card {
+      grid-column: 1 / 2;
+      max-height: 380px;
+      display: flex;
+      flex-direction: column;
+    }
+    .repo-search input {
+      width: 100%;
+      background: #2a2a3e;
+      border: 1px solid #3a3a5e;
+      color: #e0e0e0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .repo-search input:focus { border-color: #667eea; }
+    .repo-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .repo-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #2a2a3e;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .repo-item:last-child { border-bottom: none; }
+    .repo-item:hover { background: #2a2a3e; margin: 0 -12px; padding: 10px 12px; border-radius: 8px; }
+    .repo-item .repo-icon { font-size: 20px; }
+    .repo-item .repo-info { flex: 1; min-width: 0; }
+    .repo-item .repo-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #64b5f6;
+    }
+    .repo-item .repo-desc {
+      font-size: 12px;
+      color: #888;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .repo-item .repo-meta {
+      display: flex;
+      gap: 10px;
+      font-size: 11px;
+      color: #666;
+      flex-shrink: 0;
+    }
+    .loading { color: #666; font-size: 13px; padding: 12px 0; text-align: center; }
+
+    /* ========== AI Chat ========== */
+    .ai-card {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+    }
+    .ai-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .ai-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #2a2a3e;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .ai-item:hover {
+      background: #3a3a5e;
+      border-color: #667eea;
+      transform: translateY(-1px);
+    }
+    .ai-item .ai-icon { font-size: 22px; }
+    .ai-item .ai-name {
+      flex: 1;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+    .ai-item .ai-shortcut {
+      font-size: 10px;
+      background: #1a1a2e;
+      color: #667eea;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', monospace;
+    }
+    .ai-custom-link {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .ai-custom-link input {
+      flex: 1;
+      background: #2a2a3e;
+      border: 1px solid #3a3a5e;
+      color: #e0e0e0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+    }
+    .ai-custom-link input:focus { border-color: #667eea; }
+    .ai-custom-link button {
+      background: #667eea;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .ai-custom-link button:hover { background: #5a6fd6; }
+    .ai-custom-list { margin-top: 4px; }
+    .ai-custom-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      font-size: 13px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    .ai-custom-item:hover { background: #2a2a3e; }
+    .ai-custom-item a {
+      flex: 1;
+      color: #64b5f6;
+      text-decoration: none;
+    }
+    .ai-custom-item a:hover { text-decoration: underline; }
+    .ai-custom-item .delete-ai {
+      color: #f44336;
+      cursor: pointer;
+      opacity: 0.4;
+      font-size: 12px;
+    }
+    .ai-custom-item .delete-ai:hover { opacity: 1; }
+
+    /* ========== Leisure Quick Buttons ========== */
+    .leisure-quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .leisure-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
+      background: #2a2a3e;
+      border-radius: 16px;
+      text-decoration: none;
+      font-size: 12px;
+      color: #e0e0e0;
+      transition: all 0.2s;
+    }
+    .leisure-btn:hover {
+      background: #3a3a5e;
+      transform: translateY(-1px);
+    }
+    .leisure-btn span { font-size: 14px; }
+
     /* ========== Pomodoro Timer ========== */
     .pomodoro-card {
       grid-column: 1 / -1;
@@ -537,6 +713,26 @@
 
       <div class="card">
         <div class="card-title">🎮 休闲娱乐</div>
+        <div class="leisure-quick">
+          <a href="https://www.bilibili.com" target="_blank" class="leisure-btn" style="background:#fb7299;color:#fff;">
+            <span>📺</span> 哔哩哔哩
+          </a>
+          <a href="https://www.youtube.com" target="_blank" class="leisure-btn">
+            <span>▶️</span> YouTube
+          </a>
+          <a href="https://www.netflix.com" target="_blank" class="leisure-btn">
+            <span>🎬</span> Netflix
+          </a>
+          <a href="https://open.spotify.com" target="_blank" class="leisure-btn">
+            <span>🎵</span> Spotify
+          </a>
+          <a href="https://www.douyin.com" target="_blank" class="leisure-btn">
+            <span>🎶</span> 抖音
+          </a>
+          <a href="https://www.twitch.tv" target="_blank" class="leisure-btn">
+            <span>🎮</span> Twitch
+          </a>
+        </div>
         <div id="leisure-list"></div>
         <div class="add-item-form">
           <input type="text" id="leisure-input" placeholder="添加休闲活动..." maxlength="80">
@@ -553,6 +749,63 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- ===== GitHub Repositories ===== -->
+    <div class="card repo-card">
+      <div class="card-title">
+        📂 GitHub 仓库
+        <span class="badge" id="repo-count">加载中...</span>
+      </div>
+      <div class="repo-search">
+        <input type="text" id="repo-search-input" placeholder="搜索仓库..." oninput="filterRepos()">
+      </div>
+      <div class="repo-list" id="repo-list">
+        <div class="loading">加载中...</div>
+      </div>
+    </div>
+
+    <!-- ===== AI Chat ===== -->
+    <div class="card ai-card">
+      <div class="card-title">🤖 AI 对话</div>
+      <div class="ai-grid" id="ai-grid">
+        <a href="https://kimi.moonshot.cn" target="_blank" class="ai-item" data-key="kimi">
+          <div class="ai-icon">🌙</div>
+          <div class="ai-name">Kimi</div>
+          <div class="ai-shortcut">Ctrl+K</div>
+        </a>
+        <a href="https://github.com/copilot" target="_blank" class="ai-item" data-key="copilot">
+          <div class="ai-icon">👾</div>
+          <div class="ai-name">Copilot</div>
+          <div class="ai-shortcut">Ctrl+I</div>
+        </a>
+        <a href="https://chat.deepseek.com" target="_blank" class="ai-item" data-key="deepseek">
+          <div class="ai-icon">🔮</div>
+          <div class="ai-name">DeepSeek</div>
+          <div class="ai-shortcut">Ctrl+U</div>
+        </a>
+        <a href="https://chatgpt.com" target="_blank" class="ai-item" data-key="chatgpt">
+          <div class="ai-icon">💬</div>
+          <div class="ai-name">ChatGPT</div>
+          <div class="ai-shortcut">Ctrl+J</div>
+        </a>
+        <a href="https://claude.ai" target="_blank" class="ai-item" data-key="claude">
+          <div class="ai-icon">🌀</div>
+          <div class="ai-name">Claude</div>
+          <div class="ai-shortcut">Ctrl+L</div>
+        </a>
+        <a href="https://www.perplexity.ai" target="_blank" class="ai-item" data-key="perplexity">
+          <div class="ai-icon">🔍</div>
+          <div class="ai-name">Perplexity</div>
+          <div class="ai-shortcut">Ctrl+P</div>
+        </a>
+      </div>
+      <div class="ai-custom-link">
+        <input type="text" id="ai-custom-url" placeholder="输入网址...">
+        <input type="text" id="ai-custom-name" placeholder="名称...">
+        <button onclick="addCustomAI()">➕ 添加</button>
+      </div>
+      <div class="ai-custom-list" id="ai-custom-list"></div>
     </div>
 
     <!-- ===== Pomodoro Timer ===== -->
@@ -979,6 +1232,122 @@ function deleteGoal(index) {
 }
 
 // ============================================================
+//  GITHUB REPOS
+// ============================================================
+let allRepos = [];
+
+async function fetchRepos() {
+  const list = document.getElementById('repo-list');
+  try {
+    const resp = await fetch('https://api.github.com/users/qyh-donghai/repos?sort=updated&per_page=30&type=all');
+    if (!resp.ok) throw new Error('Fetch failed');
+    allRepos = await resp.json();
+    document.getElementById('repo-count').textContent = `共 ${allRepos.length} 个`;
+    renderRepos(allRepos);
+  } catch (e) {
+    list.innerHTML = '<div class="loading">❌ 加载仓库失败</div>';
+  }
+}
+
+function renderRepos(repos) {
+  const list = document.getElementById('repo-list');
+  if (repos.length === 0) {
+    list.innerHTML = '<div class="loading">没有匹配的仓库</div>';
+    return;
+  }
+  list.innerHTML = repos.map(repo => {
+    const lang = repo.language || '';
+    const stars = repo.stargazers_count || 0;
+    const desc = repo.description || '';
+    const updated = new Date(repo.updated_at).toLocaleDateString('zh-CN');
+    const icon = repo.fork ? '🔀' : '📦';
+    return `
+      <div class="repo-item" onclick="window.open('${repo.html_url}','_blank')">
+        <span class="repo-icon">${icon}</span>
+        <div class="repo-info">
+          <div class="repo-name">${repo.name}</div>
+          <div class="repo-desc">${escapeHtml(desc || '暂无描述')}</div>
+        </div>
+        <div class="repo-meta">
+          ${lang ? `<span>${lang}</span>` : ''}
+          ${stars ? `<span>★${stars}</span>` : ''}
+          <span>${updated}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function filterRepos() {
+  const q = document.getElementById('repo-search-input').value.toLowerCase();
+  if (!q) { renderRepos(allRepos); return; }
+  const filtered = allRepos.filter(r =>
+    r.name.toLowerCase().includes(q) ||
+    (r.description && r.description.toLowerCase().includes(q)) ||
+    (r.language && r.language.toLowerCase().includes(q))
+  );
+  renderRepos(filtered);
+  document.getElementById('repo-count').textContent = `筛选 ${filtered.length}/${allRepos.length}`;
+}
+
+// ============================================================
+//  AI CHAT + KEYBOARD SHORTCUTS
+// ============================================================
+const AI_SHORTCUTS = {
+  'k': 'kimi', 'i': 'copilot', 'u': 'deepseek',
+  'j': 'chatgpt', 'l': 'claude', 'p': 'perplexity',
+};
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && AI_SHORTCUTS[e.key]) {
+    e.preventDefault();
+    const target = document.querySelector(`.ai-item[data-key="${AI_SHORTCUTS[e.key]}"]`);
+    if (target) target.click();
+  }
+});
+
+function loadCustomAI() {
+  try {
+    const data = JSON.parse(localStorage.getItem('custom_ai') || '[]');
+    renderCustomAI(data);
+  } catch {}
+}
+
+function addCustomAI() {
+  const urlInput = document.getElementById('ai-custom-url');
+  const nameInput = document.getElementById('ai-custom-name');
+  let url = urlInput.value.trim();
+  const name = nameInput.value.trim();
+  if (!url || !name) return;
+  if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+  const data = JSON.parse(localStorage.getItem('custom_ai') || '[]');
+  data.push({ id: Date.now(), url, name });
+  localStorage.setItem('custom_ai', JSON.stringify(data));
+  urlInput.value = '';
+  nameInput.value = '';
+  renderCustomAI(data);
+}
+
+function deleteCustomAI(id) {
+  const data = JSON.parse(localStorage.getItem('custom_ai') || '[]');
+  const filtered = data.filter(d => d.id !== id);
+  localStorage.setItem('custom_ai', JSON.stringify(filtered));
+  renderCustomAI(filtered);
+}
+
+function renderCustomAI(data) {
+  const list = document.getElementById('ai-custom-list');
+  if (data.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = data.map(d => `
+    <div class="ai-custom-item">
+      <span>🔗</span>
+      <a href="${d.url}" target="_blank">${escapeHtml(d.name)}</a>
+      <span class="delete-ai" onclick="deleteCustomAI(${d.id})">✕</span>
+    </div>
+  `).join('');
+}
+
+// ============================================================
 //  POMODORO TIMER
 // ============================================================
 const POMO_CONFIG = {
@@ -1134,6 +1503,8 @@ function renderAll() {
   renderGoals();
   loadPomoState();
   setPomoMode(pomoState.mode);
+  fetchRepos();
+  loadCustomAI();
 }
 
 // ============================================================
