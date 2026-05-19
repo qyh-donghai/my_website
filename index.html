@@ -1287,8 +1287,8 @@ function deleteLearning(index) {
 // ============================================================
 const LINK_DEFAULTS = {
   leisure: [
-    { name: '哔哩哔哩', url: 'https://www.bilibili.com' },
-    { name: '抖音', url: 'https://www.douyin.com' },
+    { name: '哔哩哔哩', url: 'https://www.bilibili.com', color: '#fb7299' },
+    { name: '抖音', url: 'https://www.douyin.com', color: '#1a1a1a' },
   ],
   code: [
     { name: '代码随想录', url: 'https://www.programmercarl.com' },
@@ -1330,9 +1330,10 @@ function renderLinks(type) {
   container.innerHTML = links.map((link, i) => {
     const emoji = link.emoji || LINK_EMOJIS[i % LINK_EMOJIS.length];
     const bg = link.color || hashColor(link.name);
+    const textColor = link.color === '#1a1a1a' || link.color === '#000' ? '#fff' : '';
     return `
       <a href="${link.url}" target="_blank" class="link-btn"
-         style="background:${bg};" title="${link.url}">
+         style="background:${bg};${textColor ? 'color:'+textColor+';' : ''}" title="${link.url}">
         ${emoji} ${link.name}
         <span class="del-link" onclick="event.preventDefault();event.stopPropagation();deleteLink('${type}',${i})">✕</span>
       </a>
