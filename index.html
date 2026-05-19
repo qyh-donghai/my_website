@@ -562,30 +562,70 @@
     }
     .ai-custom-item .delete-ai:hover { opacity: 1; }
 
-    /* ========== Leisure Quick Buttons ========== */
-    .leisure-quick {
+    /* ========== Link Section (休闲娱乐 & 代码) ========== */
+    .link-section {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
       margin-bottom: 12px;
+      min-height: 32px;
     }
-    .leisure-btn {
+    .link-section .empty-hint {
+      color: #666;
+      font-size: 13px;
+      width: 100%;
+      padding: 4px 0;
+    }
+    .link-btn {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       padding: 5px 12px;
-      background: #2a2a3e;
       border-radius: 16px;
       text-decoration: none;
       font-size: 12px;
       color: #e0e0e0;
       transition: all 0.2s;
+      cursor: pointer;
     }
-    .leisure-btn:hover {
-      background: #3a3a5e;
+    .link-btn:hover {
       transform: translateY(-1px);
+      filter: brightness(1.2);
     }
-    .leisure-btn span { font-size: 14px; }
+    .link-btn .del-link {
+      color: rgba(255,255,255,0.5);
+      font-size: 10px;
+      margin-left: 2px;
+    }
+    .link-btn .del-link:hover { color: #fff; }
+    .link-add-form {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .link-add-form input {
+      flex: 1;
+      min-width: 100px;
+      background: #2a2a3e;
+      border: 1px solid #3a3a5e;
+      color: #e0e0e0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+    }
+    .link-add-form input:focus { border-color: #667eea; }
+    .link-add-form button {
+      background: #667eea;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .link-add-form button:hover { background: #5a6fd6; }
 
     /* ========== Pomodoro Timer ========== */
     .pomodoro-card {
@@ -780,44 +820,21 @@
 
       <div class="card">
         <div class="card-title">🎮 休闲娱乐</div>
-        <div class="leisure-quick">
-          <a href="https://www.bilibili.com" target="_blank" class="leisure-btn" style="background:#fb7299;color:#fff;">
-            <span>📺</span> 哔哩哔哩
-          </a>
-          <a href="https://www.douyin.com" target="_blank" class="leisure-btn">
-            <span>🎶</span> 抖音
-          </a>
-        </div>
-        <div id="leisure-list"></div>
-        <div class="add-item-form">
-          <input type="text" id="leisure-input" placeholder="添加休闲活动..." maxlength="80">
-          <button onclick="addLeisure()">添加</button>
+        <div class="link-section" id="leisure-links"></div>
+        <div class="link-add-form">
+          <input type="text" class="link-name" placeholder="名称（如：哔哩哔哩）" maxlength="30">
+          <input type="text" class="link-url" placeholder="网址（如：https://bilibili.com）" maxlength="200">
+          <button onclick="addLink('leisure')">➕ 添加</button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-title">💻 代码</div>
-        <div class="leisure-quick">
-          <a href="https://www.programmercarl.com" target="_blank" class="leisure-btn" style="background:#42b883;">
-            <span>📖</span> 代码随想录
-          </a>
-          <a href="https://kamacoder.com" target="_blank" class="leisure-btn" style="background:#1a73e8;">
-            <span>🖥️</span> 卡码网
-          </a>
-          <a href="https://www.luogu.com.cn" target="_blank" class="leisure-btn" style="background:#f39c12;">
-            <span>🏔️</span> 洛谷
-          </a>
-          <a href="https://www.nowcoder.com" target="_blank" class="leisure-btn" style="background:#e74c3c;">
-            <span>🟢</span> 牛客网
-          </a>
-          <a href="https://cs.usfca.edu/~galles/visualization/Algorithms.html" target="_blank" class="leisure-btn" style="background:#9b59b6;">
-            <span>🔬</span> 数据结构可视化
-          </a>
-        </div>
-        <div id="study-list"></div>
-        <div class="add-item-form">
-          <input type="text" id="study-input" placeholder="添加代码任务..." maxlength="80">
-          <button onclick="addStudy()">添加</button>
+        <div class="link-section" id="code-links"></div>
+        <div class="link-add-form">
+          <input type="text" class="link-name" placeholder="名称（如：代码随想录）" maxlength="30">
+          <input type="text" class="link-url" placeholder="网址（如：https://programmercarl.com）" maxlength="200">
+          <button onclick="addLink('code')">➕ 添加</button>
         </div>
       </div>
 
@@ -1265,72 +1282,85 @@ function deleteLearning(index) {
   renderLearning();
 }
 
-function renderStudy() {
-  const data = getData();
-  const list = document.getElementById('study-list');
-  if (data.study.length === 0) {
-    list.innerHTML = '<div style="color:#666;font-size:13px;padding:8px 0;">暂无学习任务 📚</div>';
+// ============================================================
+//  LINK MANAGER (休闲娱乐 & 代码 - 自定义URL按钮)
+// ============================================================
+const LINK_DEFAULTS = {
+  leisure: [
+    { name: '哔哩哔哩', url: 'https://www.bilibili.com' },
+    { name: '抖音', url: 'https://www.douyin.com' },
+  ],
+  code: [
+    { name: '代码随想录', url: 'https://www.programmercarl.com' },
+    { name: '卡码网', url: 'https://kamacoder.com' },
+    { name: '洛谷', url: 'https://www.luogu.com.cn' },
+    { name: '牛客网', url: 'https://www.nowcoder.com' },
+    { name: '数据结构可视化', url: 'https://cs.usfca.edu/~galles/visualization/Algorithms.html' },
+  ],
+};
+
+const LINK_EMOJIS = ['📺','🎶','🎬','🎵','🎮','📖','🖥️','🏔️','🔬','🌐','⚡','🎯','📚','🎨','🔧','💡','🚀','📝','🎉','🌟'];
+
+function getLinks(type) {
+  try {
+    const raw = localStorage.getItem(`links_${type}`);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  const defaults = LINK_DEFAULTS[type] || [];
+  localStorage.setItem(`links_${type}`, JSON.stringify(defaults));
+  return defaults;
+}
+
+function saveLinks(type, links) {
+  localStorage.setItem(`links_${type}`, JSON.stringify(links));
+}
+
+function renderLinks(type) {
+  const container = document.getElementById(`${type}-links`);
+  const links = getLinks(type);
+  if (links.length === 0) {
+    container.innerHTML = '<div class="empty-hint">还没有链接，添加一个吧 ✨</div>';
     return;
   }
-  list.innerHTML = data.study.map((item, i) => `
-    <div class="list-item">
-      <span class="emoji">📝</span>
-      <span class="item-title">${escapeHtml(item.text)}</span>
-      <span class="delete-item" onclick="deleteStudy(${i})">✕</span>
-    </div>
-  `).join('');
+  const hashColor = (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    return `hsl(${Math.abs(hash) % 360}, 55%, 45%)`;
+  };
+  container.innerHTML = links.map((link, i) => {
+    const emoji = link.emoji || LINK_EMOJIS[i % LINK_EMOJIS.length];
+    const bg = link.color || hashColor(link.name);
+    return `
+      <a href="${link.url}" target="_blank" class="link-btn"
+         style="background:${bg};" title="${link.url}">
+        ${emoji} ${link.name}
+        <span class="del-link" onclick="event.preventDefault();event.stopPropagation();deleteLink('${type}',${i})">✕</span>
+      </a>
+    `;
+  }).join('');
 }
 
-function addStudy() {
-  const input = document.getElementById('study-input');
-  const text = input.value.trim();
-  if (!text) return;
-  const data = getData();
-  data.study.push({ id: uid(), text });
-  saveData(data);
-  input.value = '';
-  renderStudy();
+function addLink(type) {
+  const card = document.querySelector(`#${type}-links`).closest('.card');
+  const nameInput = card.querySelector('.link-name');
+  const urlInput = card.querySelector('.link-url');
+  const name = nameInput.value.trim();
+  let url = urlInput.value.trim();
+  if (!name || !url) return;
+  if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+  const links = getLinks(type);
+  links.push({ name, url });
+  saveLinks(type, links);
+  nameInput.value = '';
+  urlInput.value = '';
+  renderLinks(type);
 }
 
-function deleteStudy(index) {
-  const data = getData();
-  data.study.splice(index, 1);
-  saveData(data);
-  renderStudy();
-}
-
-function renderLeisure() {
-  const data = getData();
-  const list = document.getElementById('leisure-list');
-  if (data.leisure.length === 0) {
-    list.innerHTML = '<div style="color:#666;font-size:13px;padding:8px 0;">该放松一下了 🎉</div>';
-    return;
-  }
-  list.innerHTML = data.leisure.map((item, i) => `
-    <div class="list-item">
-      <span class="emoji">🎮</span>
-      <span class="item-title">${escapeHtml(item.text)}</span>
-      <span class="delete-item" onclick="deleteLeisure(${i})">✕</span>
-    </div>
-  `).join('');
-}
-
-function addLeisure() {
-  const input = document.getElementById('leisure-input');
-  const text = input.value.trim();
-  if (!text) return;
-  const data = getData();
-  data.leisure.push({ id: uid(), text });
-  saveData(data);
-  input.value = '';
-  renderLeisure();
-}
-
-function deleteLeisure(index) {
-  const data = getData();
-  data.leisure.splice(index, 1);
-  saveData(data);
-  renderLeisure();
+function deleteLink(type, index) {
+  const links = getLinks(type);
+  links.splice(index, 1);
+  saveLinks(type, links);
+  renderLinks(type);
 }
 
 function renderGoals() {
@@ -1634,8 +1664,8 @@ function escapeHtml(text) {
 function renderAll() {
   renderCalendar();
   renderLearning();
-  renderStudy();
-  renderLeisure();
+  renderLinks('leisure');
+  renderLinks('code');
   renderGoals();
   loadPomoState();
   setPomoMode(pomoState.mode);
