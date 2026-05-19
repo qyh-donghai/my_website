@@ -97,6 +97,75 @@
       background: radial-gradient(circle, rgba(102,126,234,0.08) 0%, transparent 70%);
       border-radius: 50%;
     }
+    .weather-manage {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .weather-cities {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .weather-city-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      background: #2a2a3e;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .weather-city-tag:hover { border-color: #667eea; }
+    .weather-city-tag.active {
+      background: #667eea;
+      border-color: #667eea;
+      color: #fff;
+    }
+    .weather-city-tag .del {
+      color: #f44336;
+      opacity: 0.5;
+      margin-left: 2px;
+      font-size: 10px;
+    }
+    .weather-city-tag .del:hover { opacity: 1; }
+    .weather-add {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+      min-width: 140px;
+    }
+    .weather-add input {
+      flex: 1;
+      background: #2a2a3e;
+      border: 1px solid #3a3a5e;
+      color: #e0e0e0;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      outline: none;
+      min-width: 80px;
+    }
+    .weather-add input:focus { border-color: #667eea; }
+    .weather-add button {
+      background: #667eea;
+      color: #fff;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .weather-add button:hover { background: #5a6fd6; }
     .weather-content {
       display: flex;
       align-items: center;
@@ -656,13 +725,20 @@
           <div>
             <div class="weather-temp" id="weather-temp">--°C</div>
             <div class="weather-desc" id="weather-desc">加载中...</div>
-            <div class="weather-city" id="weather-city">📍 获取位置中</div>
+            <div class="weather-city" id="weather-city">📍 东海县</div>
           </div>
         </div>
         <div class="weather-details">
           <span>💧 <span id="weather-humidity">--</span></span>
           <span>🌬️ <span id="weather-wind">--</span></span>
           <span>🔆 <span id="weather-uv">--</span></span>
+        </div>
+      </div>
+      <div class="weather-manage">
+        <div class="weather-cities" id="weather-cities"></div>
+        <div class="weather-add">
+          <input type="text" id="weather-city-input" placeholder="添加城市（如：东海县）" maxlength="30">
+          <button onclick="addWeatherCity()">➕</button>
         </div>
       </div>
     </div>
@@ -887,22 +963,83 @@ function resetAllData() {
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
 // ============================================================
-//  WEATHER (wttr.in - free, no API key)
+//  WEATHER (wttr.in + 自定义城市)
 // ============================================================
+const DEFAULT_CITIES = ['东海县', '北京', '上海', '深圳', '杭州'];
+
+function getWeatherCities() {
+  try {
+    return JSON.parse(localStorage.getItem('weather_cities') || '[]');
+  } catch { return []; }
+}
+
+function saveWeatherCities(cities) {
+  localStorage.setItem('weather_cities', JSON.stringify(cities));
+}
+
+function renderWeatherCities() {
+  const container = document.getElementById('weather-cities');
+  let cities = getWeatherCities();
+  if (cities.length === 0) {
+    cities = DEFAULT_CITIES;
+    saveWeatherCities(cities);
+  }
+  const active = localStorage.getItem('weather_active_city') || cities[0];
+  container.innerHTML = cities.map(c => `
+    <span class="weather-city-tag ${c === active ? 'active' : ''}"
+          onclick="switchWeatherCity('${c}')">
+      ${c}
+      <span class="del" onclick="event.stopPropagation();deleteWeatherCity('${c}')">✕</span>
+    </span>
+  `).join('');
+}
+
+function switchWeatherCity(city) {
+  localStorage.setItem('weather_active_city', city);
+  renderWeatherCities();
+  fetchWeather();
+}
+
+function addWeatherCity() {
+  const input = document.getElementById('weather-city-input');
+  const city = input.value.trim();
+  if (!city) return;
+  let cities = getWeatherCities();
+  if (cities.length === 0) cities = DEFAULT_CITIES;
+  if (!cities.includes(city)) {
+    cities.push(city);
+    saveWeatherCities(cities);
+  }
+  input.value = '';
+  switchWeatherCity(city);
+}
+
+function deleteWeatherCity(city) {
+  let cities = getWeatherCities();
+  if (cities.length === 0) cities = DEFAULT_CITIES;
+  cities = cities.filter(c => c !== city);
+  if (cities.length === 0) cities = ['东海县'];
+  saveWeatherCities(cities);
+  const active = localStorage.getItem('weather_active_city');
+  if (active === city || !cities.includes(active)) {
+    localStorage.setItem('weather_active_city', cities[0]);
+  }
+  renderWeatherCities();
+  fetchWeather();
+}
+
 async function fetchWeather() {
   try {
-    // Get city from data or detect via IP
-    let data = getData();
-    const city = data.city || '';
-    const url = city
-      ? `https://wttr.in/${encodeURIComponent(city)}?format=j1`
-      : 'https://wttr.in/?format=j1';
+    const cities = getWeatherCities();
+    const active = localStorage.getItem('weather_active_city') || (cities[0] || '东海县');
+    // Convert Chinese name to pinyin for wttr.in (use Chinese directly, wttr.in supports it)
+    const url = `https://wttr.in/${encodeURIComponent(active)}?format=j1&lang=zh`;
 
     const resp = await fetch(url, { cache: 'no-cache' });
-    if (!resp.ok) throw new Error('Weather fetch failed');
+    if (!resp.ok) throw new Error('Fetch failed');
     const json = await resp.json();
     const cur = json.current_condition[0];
-    const loc = json.nearest_area?.[0]?.areaName?.[0]?.value || '未知';
+    const loc = json.nearest_area?.[0]?.areaName?.[0]?.value || active;
 
     document.getElementById('weather-icon').textContent = getWeatherEmoji(cur.weatherCode);
     document.getElementById('weather-temp').textContent = `${cur.temp_C}°C`;
@@ -911,16 +1048,10 @@ async function fetchWeather() {
     document.getElementById('weather-humidity').textContent = `${cur.humidity}%`;
     document.getElementById('weather-wind').textContent = `${cur.windspeedKmph} km/h`;
     document.getElementById('weather-uv').textContent = `${cur.uvIndex}`;
-
-    // Save city for next time
-    if (!data.city) {
-      data.city = loc;
-      saveData(data);
-    }
   } catch (e) {
     document.getElementById('weather-temp').textContent = '--°C';
     document.getElementById('weather-desc').textContent = '天气服务暂不可用';
-    document.getElementById('weather-city').textContent = '📍 新加坡';
+    document.getElementById('weather-city').textContent = `📍 ${localStorage.getItem('weather_active_city') || '东海县'}`;
   }
 }
 
@@ -1508,6 +1639,7 @@ function renderAll() {
   renderGoals();
   loadPomoState();
   setPomoMode(pomoState.mode);
+  renderWeatherCities();
   fetchRepos();
   loadCustomAI();
 }
